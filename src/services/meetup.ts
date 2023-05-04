@@ -1,8 +1,10 @@
 import { type Request } from 'express';
+import path from 'path';
 
 import { INTERNAL_SERVER_ERROR, NOT_FOUND } from '../constants/httpMessages';
 import { db, meetupQueries } from '../db';
 import { type Result } from '../types';
+import { generateReport } from '../utils/generateReport';
 import { type CreateProps, type UpdateProps } from './types';
 
 class MeetupService {
@@ -53,6 +55,24 @@ class MeetupService {
       return { result, status: 201 };
     } catch (err) {
       return { status: 500, error: true, result: INTERNAL_SERVER_ERROR };
+    }
+  }
+
+  async generateReport(id: string) {
+    try {
+      const data = await db.many(meetupQueries.getByParticipant, [id]);
+
+      generateReport(data);
+
+      return {
+        status: 200,
+        file: path.join(__dirname, '..', '..', 'rep.csv'),
+      };
+    } catch (err) {
+      return {
+        status: 200,
+        message: (err as Error).message,
+      };
     }
   }
 

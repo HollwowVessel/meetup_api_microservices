@@ -1,15 +1,12 @@
 import { type Request, type Response } from 'express';
 import { verify } from 'jsonwebtoken';
-import path from 'path';
 
 import { REFRESH_TOKEN_SECRET } from '../constants';
-import { db, meetupQueries } from '../db';
 import { type IMeetup, type IQuery } from '../schemes/meetup/interfaces';
 import { type IJWTInfo } from '../schemes/user/interfaces';
 import { meetupService } from '../services/meetup';
 import { type Result } from '../types';
 import { createSearchQuery } from '../utils/createSearchQuery';
-import { generateReport } from '../utils/generateReport';
 import { sendMessage } from '../utils/sendMessage';
 
 class MeetupController {
@@ -66,18 +63,16 @@ class MeetupController {
   }
 
   async generateReport(req: Request, res: Response) {
-    try {
-      const { refreshToken } = req.cookies;
+    const { refreshToken } = req.cookies;
 
-      const { id } = verify(refreshToken, REFRESH_TOKEN_SECRET!) as IJWTInfo;
+    const { id } = verify(refreshToken, REFRESH_TOKEN_SECRET!) as IJWTInfo;
 
-      const data = await db.many(meetupQueries.getByParticipant, [id]);
+    const { file, status, message } = await meetupService.generateReport(id);
 
-      generateReport(data);
-
-      res.status(200).sendFile(path.join(__dirname, '..', '..', 'rep.csv'));
-    } catch (err) {
-      res.status(404).json({ message: (err as Error).message });
+    if (file) {
+      res.status(status).sendFile(file);
+    } else {
+      res.status(status).json({ message });
     }
   }
 
@@ -98,7 +93,6 @@ class MeetupController {
       participants,
       creator_id: id,
     };
-    console.log(5);
 
     const data = await meetupService.create(params);
 
