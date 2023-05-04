@@ -1,0 +1,3 @@
+DELETE FROM meetups
+WHERE id = $1
+RETURNING *

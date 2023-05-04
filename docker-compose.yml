@@ -1,0 +1,29 @@
+version: '3'
+services:
+  app:
+    restart: always
+    build: .
+    depends_on:
+      - postgres
+    environment:
+      - .env
+    ports:
+      - '${PORT}:${PORT}'
+    command: yarn start:dev
+    volumes:
+      - /app/node_modules
+      - ./:/app
+
+  postgres:
+    container_name: postgres
+    restart: always
+    image: postgres:latest
+    ports:
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./src/db/queries/init.sql:/docker-entrypoint-initdb.d/init.sql
