@@ -9,6 +9,16 @@ export const userSchema = Joi.object({
     .optional(),
 });
 
+export const userPatchSchema = Joi.object({
+  email: Joi.string().email().optional(),
+  password: Joi.string().optional(),
+  username: Joi.string().optional(),
+  sex: Joi.string()
+    .pattern(/male|female/, 'male, female')
+    .optional(),
+  name: Joi.string().optional(),
+});
+
 export const loginSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required(),

@@ -79,6 +79,49 @@ class UserService {
       };
     }
   }
+
+  async fillProfile({
+    password,
+    username,
+    email,
+    sex,
+    name,
+    id,
+  }: {
+    password: string;
+    username: string;
+    email: string;
+    sex: string;
+    name: string;
+    id: number;
+  }) {
+    try {
+      console.log(id);
+      let hashedPassword;
+      if (password) {
+        hashedPassword = await bcrypt.hash(password, 10);
+      }
+
+      const {
+        username: prevUsername,
+        password: prevPassword,
+        email: prevEmail,
+        sex: prevSex,
+        name: prevName,
+      } = await db.one(userQueries.getById, [id]);
+
+      await db.one(userQueries.update, {
+        password: hashedPassword || prevPassword,
+        username: username || prevUsername,
+        email: email || prevEmail,
+        sex: sex || prevSex,
+        name: name || prevName,
+        id,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }
 }
 
 export const userService = new UserService();

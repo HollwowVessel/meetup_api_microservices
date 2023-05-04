@@ -31,4 +31,5 @@ export const userQueries = {
   getByEmail: createQuery(__dirname, 'queries/user/getByEmail.sql'),
   create: createQuery(__dirname, 'queries/user/create.sql'),
   updateToken: createQuery(__dirname, 'queries/user/updateToken.sql'),
+  update: createQuery(__dirname, 'queries/user/update.sql'),
 };
